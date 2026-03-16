@@ -355,380 +355,361 @@
             text-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
         }
         
-        /* Page 1 - 开场 - 游戏风格 */
+        /* 全局后期处理层 */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 90;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+        }
+
+        .film-grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 91;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Page 1 - 开场 - 极致重构 */
         .page-1 .main-title {
-            font-family: 'Rajdhani', 'Noto Sans SC', sans-serif;
-            font-size: clamp(1.5rem, 5vw, 3rem);
-            font-weight: 500;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.8rem); /* 调小，作为精致的肩题 */
+            font-weight: 600;
             margin-bottom: 0.5rem;
-            letter-spacing: 0.4em;
+            letter-spacing: 0.8em;
             text-transform: uppercase;
-            color: var(--text-secondary);
-            text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            color: rgba(255, 255, 255, 0.6);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            animation: fadeInDown 1.5s ease-out;
         }
         
         .page-1 .subtitle {
             font-family: 'Noto Serif JP', serif;
-            font-size: clamp(1rem, 2.5vw, 1.5rem);
-            font-weight: 400;
-            margin-bottom: 1.5rem;
-            letter-spacing: 0.3em;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            font-weight: 300;
+            margin-bottom: 3rem;
+            letter-spacing: 0.4em;
             color: var(--accent-magenta);
-            text-shadow: 0 0 15px rgba(192, 132, 252, 0.4);
+            opacity: 0.8;
+            animation: fadeInDown 1.5s ease-out 0.2s backwards;
         }
         
+        /* 名字 - 流变虹光质感 (Iridescent Radiant) */
         .page-1 .name {
             font-family: 'Noto Serif JP', serif;
-            font-size: clamp(4rem, 12vw, 8rem);
+            font-size: clamp(4.5rem, 13vw, 9rem);
             font-weight: 700;
-            margin-bottom: 2rem;
-            letter-spacing: 0.2em;
+            margin-bottom: 3rem;
+            letter-spacing: 0.1em;
             position: relative;
             display: inline-block;
-            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 50%, var(--accent-magenta) 100%);
+            
+            /* 流动渐变色 - 米哈游风格霓虹色 */
+            background: linear-gradient(
+                120deg, 
+                #00d9ff 0%, 
+                #8b5cf6 25%, 
+                #c084fc 50%, 
+                #fbbf24 75%, 
+                #00d9ff 100%
+            );
+            background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.5));
+            
+            /* 极其精致的微光边缘 */
+            -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.3);
+            
+            /* 复合光晕层级 */
+            filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.4)) 
+                    drop-shadow(0 0 40px rgba(0, 217, 255, 0.2));
+            
+            animation: 
+                iridescentFlow 6s linear infinite,
+                zoomIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
         
-        .page-1 .name::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
-            box-shadow: 0 0 15px var(--accent-cyan);
+        @keyframes iridescentFlow {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
         }
+
+        .page-1 .name::before, .page-1 .name::after { display: none; } /* 确保移除旧线条 */
         
-        .page-1 .name::after {
-            content: '';
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-purple), var(--accent-cyan), transparent);
-            box-shadow: 0 0 10px var(--accent-purple);
+        /* 日期 - 星际铭文风格 */
+        .page-1 .date-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fadeInUp 1.5s ease-out 0.5s forwards;
         }
-        
+
         .page-1 .date {
             font-family: 'Rajdhani', sans-serif;
-            font-size: clamp(1.5rem, 3vw, 2.2rem);
-            font-weight: 600;
-            letter-spacing: 0.6em;
-            color: var(--accent-cyan);
-            margin-top: 2.5rem;
-            padding: 1rem 2.5rem;
-            border: 2px solid var(--ui-border);
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(139, 92, 246, 0.1));
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .page-1 .date::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.2), transparent);
-            animation: dateShine 3s infinite;
-        }
-        
-        @keyframes dateShine {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        
-        /* Page 2 - 祝福语 - 游戏UI风格卡片 */
-        .page-2 .blessing-card {
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(25, 25, 50, 0.85));
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid var(--ui-border);
-            border-radius: 16px;
-            padding: 3.5rem 2.5rem;
-            max-width: 680px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 0 40px rgba(139, 92, 246, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-        
-        .page-2 .blessing-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), var(--accent-cyan), transparent);
-            box-shadow: 0 0 10px var(--accent-cyan);
-        }
-        
-        .page-2 .blessing-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-purple), var(--accent-magenta), var(--accent-purple), transparent);
-        }
-        
-        .page-2 .blessing-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: clamp(1.5rem, 3vw, 2rem);
-            margin-bottom: 2rem;
-            color: var(--accent-cyan);
-            letter-spacing: 0.15em;
-            font-weight: 600;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
-        }
-        
-        .page-2 .blessing-text {
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            line-height: 2;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-            font-weight: 400;
-        }
-        
-        .page-2 .blessing-text.jp {
-            color: var(--accent-magenta);
-            font-size: clamp(0.9rem, 2vw, 1rem);
-            line-height: 1.8;
-        }
-        
-        .page-2 .divider {
-            width: 80px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
-            margin: 1.5rem auto;
-            box-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
-        }
-        
-        .page-2 .game-icon {
-            font-size: 1.5rem;
-            margin: 1rem 0;
-            letter-spacing: 0.3em;
-            color: var(--accent-gold);
-            text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
-        }
-        
-        /* Page 3 - 特别祝福 - 游戏风格 */
-        .page-3 .special-container {
-            text-align: center;
-            max-width: 800px;
-            padding: 3rem;
-            background: linear-gradient(135deg, rgba(15, 15, 35, 0.9), rgba(20, 20, 45, 0.85));
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid var(--ui-border);
-            border-radius: 16px;
-            box-shadow: 
-                0 0 50px rgba(139, 92, 246, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .page-3 .special-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-magenta), var(--accent-purple), var(--accent-cyan));
-            box-shadow: 0 0 15px var(--accent-purple);
-        }
-        
-        .page-3 .special-title {
-            font-family: 'Rajdhani', sans-serif;
             font-size: clamp(1.8rem, 4vw, 2.5rem);
-            margin-bottom: 2.5rem;
-            color: var(--accent-cyan);
-            letter-spacing: 0.2em;
-            font-weight: 600;
+            font-weight: 300;
+            letter-spacing: 0.8em;
+            color: rgba(255, 255, 255, 0.95);
+            padding: 0.8rem 0;
             position: relative;
-            display: inline-block;
-            text-transform: uppercase;
-            text-shadow: 0 0 25px rgba(0, 217, 255, 0.5);
+            background: none;
+            border: none;
+            backdrop-filter: none;
+            text-shadow: 0 0 15px rgba(0, 217, 255, 0.6);
         }
         
-        .page-3 .special-title::after {
+        /* 上下极细能量线 */
+        .page-1 .date::before, .page-1 .date::after {
             content: '';
             position: absolute;
-            bottom: -15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
-            box-shadow: 0 0 10px var(--accent-cyan);
+            width: 140%; /* 延伸出文字 */
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.6), transparent);
         }
-        
-        .page-3 .special-text {
-            font-size: clamp(1rem, 2.2vw, 1.15rem);
-            line-height: 2.2;
-            margin-bottom: 1.5rem;
-            color: var(--text-primary);
-            font-weight: 400;
+        .page-1 .date::before { top: 0; }
+        .page-1 .date::after { bottom: 0; }
+
+        /* 装饰十字星 */
+        .page-1 .deco-star {
+            color: var(--accent-purple);
+            font-size: 0.8rem;
+            opacity: 0.8;
+            animation: spinSlow 6s linear infinite;
+            text-shadow: 0 0 8px var(--accent-purple);
         }
-        
-        .page-3 .special-text.jp {
-            color: var(--accent-magenta);
-            font-size: clamp(0.85rem, 2vw, 1rem);
-            margin-top: 1.5rem;
-            line-height: 2;
-        }
-        
-        /* Page 4 - 结尾 - 游戏风格 */
-        .page-4 .final-container {
-            text-align: center;
-            padding: 3rem;
-        }
-        
-        .page-4 .final-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: clamp(2rem, 5vw, 3rem);
-            margin-bottom: 2rem;
-            color: var(--accent-cyan);
-            letter-spacing: 0.25em;
-            font-weight: 600;
-            text-transform: uppercase;
-            text-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
-        }
-        
-        .page-4 .click-hint {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        
-        .page-4 .click-hint::after {
-            content: '▼';
-            font-size: 1.2rem;
-            color: var(--accent-cyan);
-            animation: bounceArrow 1.5s ease-in-out infinite;
-            text-shadow: 0 0 10px var(--accent-cyan);
-        }
-        
-        @keyframes bounceArrow {
-            0%, 100% { transform: translateY(0); opacity: 1; }
-            50% { transform: translateY(8px); opacity: 0.7; }
-        }
-        
-        .page-4 .heart-button {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(139, 92, 246, 0.3));
-            border: 2px solid var(--ui-border);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.2rem;
-            color: var(--accent-cyan);
-            box-shadow: 0 0 30px rgba(0, 217, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-            animation: buttonPulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes buttonPulse {
-            0%, 100% { 
-                box-shadow: 0 0 30px rgba(0, 217, 255, 0.2), 0 0 60px rgba(0, 217, 255, 0.1);
-                transform: scale(1);
-            }
-            50% { 
-                box-shadow: 0 0 40px rgba(0, 217, 255, 0.4), 0 0 80px rgba(0, 217, 255, 0.2);
-                transform: scale(1.02);
-            }
-        }
-        
-        .page-4 .heart-button {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(139, 92, 246, 0.3));
-            border: 2px solid var(--ui-border);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.2rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            margin: 0 auto;
-            color: var(--accent-cyan);
-            box-shadow: 0 0 30px rgba(0, 217, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .page-4 .heart-button::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, var(--accent-cyan), transparent 30%);
-            animation: buttonRotate 3s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .page-4 .heart-button:hover::before {
-            opacity: 0.3;
-        }
-        
-        @keyframes buttonRotate {
+
+        @keyframes spinSlow {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
         
-        .page-4 .heart-button:hover {
-            transform: scale(1.1);
-            background: linear-gradient(135deg, rgba(0, 217, 255, 0.3), rgba(139, 92, 246, 0.4));
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 50px rgba(0, 217, 255, 0.4);
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .page-4 .final-message {
-            margin-top: 3rem;
-            font-size: clamp(1.2rem, 3vw, 1.6rem);
-            line-height: 2;
-            font-weight: 500;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); filter: blur(10px); }
+            to { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        /* Page 2 - 祝福语 - 全息视窗重构 */
+        .page-2 .hologram-window {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            padding: 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .page-2 .side-title {
+            writing-mode: vertical-rl;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: rgba(0, 217, 255, 0.15);
+            text-transform: uppercase;
+            border-right: 1px solid rgba(0, 217, 255, 0.2);
+            padding-right: 2rem;
+        }
+
+        .page-2 .content-box {
+            text-align: left;
+            position: relative;
+        }
+
+        .page-2 .blessing-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.5em;
+            color: var(--accent-cyan);
+            margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-2 .blessing-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-cyan), transparent);
+        }
+
+        .page-2 .blessing-text {
+            font-size: 1.25rem;
+            line-height: 2.2;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .page-2 .blessing-text.jp {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1rem;
+            color: rgba(192, 132, 252, 0.8);
+            border-left: 2px solid var(--accent-purple);
+            padding-left: 1.5rem;
         }
         
-        .page-4 .final-message .jp {
-            font-size: 0.9em;
+        /* Page 3 - 特别祝福 - 角色星轨重构 */
+        .page-3 .special-layout {
+            max-width: 1000px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            position: relative;
+        }
+
+        .page-3 .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .page-3 .char-tag {
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
             color: var(--accent-magenta);
-            display: block;
-            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            animation: tagPulse 3s infinite alternate;
+        }
+
+        @keyframes tagPulse {
+            from { box-shadow: 0 0 5px rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.3); }
+            to { box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); border-color: rgba(139, 92, 246, 0.6); }
+        }
+
+        .page-3 .story-box {
+            align-self: flex-end;
+            max-width: 600px;
+            text-align: right;
+            border-right: 3px solid var(--accent-cyan);
+            padding-right: 2.5rem;
+        }
+
+        .page-3 .story-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 2rem;
+            letter-spacing: 0.1em;
+        }
+
+        .page-3 .story-text {
+            font-size: 1.15rem;
+            line-height: 2.5;
+            color: var(--text-secondary);
+        }
+        
+        /* Page 4 - 结尾 - 永恒核心重构 */
+        .page-4 .core-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-4 .star-soul-core {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 4rem;
+        }
+
+        /* 旋转光圈 */
+        .page-4 .orbit {
+            position: absolute;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 50%;
+            animation: orbitRotate linear infinite;
+        }
+
+        .page-4 .orbit:nth-child(1) { width: 100%; height: 100%; animation-duration: 10s; border-style: dashed; }
+        .page-4 .orbit:nth-child(2) { width: 80%; height: 80%; animation-duration: 7s; border-color: rgba(139, 92, 246, 0.4); }
+        .page-4 .orbit:nth-child(3) { width: 60%; height: 60%; animation-duration: 5s; border-style: double; }
+
+        @keyframes orbitRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .page-4 .heart-button {
+            width: 80px;
+            height: 80px;
+            border: none;
+            background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%);
+            color: white;
+            font-size: 2rem;
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 30px var(--accent-cyan);
+            animation: corePulse 2s ease-in-out infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .page-4 .heart-button:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 50px var(--accent-cyan), 0 0 100px var(--accent-purple);
+        }
+
+        @keyframes corePulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .page-4 .final-words {
+            text-align: center;
+        }
+
+        .page-4 .final-words h3 {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 0.3em;
+            color: var(--accent-cyan);
+            margin-bottom: 1.5rem;
         }
         
         /* 烟花效果 - 高张力爆炸 */
@@ -1156,6 +1137,10 @@
         <div class="deco-line"></div>
     </div>
     
+    <!-- 全局后期处理 -->
+    <div class="vignette"></div>
+    <div class="film-grain"></div>
+    
     <!-- 角落装饰 -->
     <div class="corner-deco top-left"></div>
     <div class="corner-deco top-right"></div>
@@ -1187,57 +1172,75 @@
         <div class="page page-1 active" data-page="1">
             <h1 class="main-title">Happy Birthday</h1>
             <p class="subtitle">お誕生日おめでとう</p>
-            <h2 class="name elegant-text">ゆづき</h2>
-            <div class="date">4.18</div>
+            <h2 class="name">ゆづき</h2>
+            <div class="date-container">
+                <span class="deco-star">✦</span>
+                <div class="date">4.18</div>
+                <span class="deco-star">✦</span>
+            </div>
         </div>
         
         <!-- Page 2 - 祝福语 -->
         <div class="page page-2" data-page="2">
-            <div class="blessing-card">
-                <h3 class="blessing-title">Birthday Wishes</h3>
-                <div class="game-icon">✦</div>
-                <p class="blessing-text">
-                    愿你继续带着热爱前行<br>
-                    在游戏里收藏星光，在生活中积攒温柔<br>
-                    在虚拟与现实之间，始终有自己的宁静与光
-                </p>
-                <div class="divider"></div>
-                <p class="blessing-text jp">
-                    大好きなことを持って進んでね<br>
-                    ゲームで星を集め、日常に優しさを溜めて<br>
-                    仮想と現実の間で、いつも自分の静けさと光を持っていますように
-                </p>
+            <div class="hologram-window">
+                <div class="side-title">WISHES</div>
+                <div class="content-box">
+                    <h3 class="blessing-title">BIRTHDAY MESSAGE</h3>
+                    <p class="blessing-text">
+                        愿你继续带着热爱前行<br>
+                        在游戏里收藏星光，在生活中积攒温柔<br>
+                        在虚拟与现实之间，始终有自己的宁静与光
+                    </p>
+                    <p class="blessing-text jp">
+                        大好きなことを持って進んでね<br>
+                        ゲームで星を集め、日常に優しさを溜めて<br>
+                        仮想と現実の間で、いつも自分の静けさと光を持っていますように
+                    </p>
+                </div>
             </div>
         </div>
         
         <!-- Page 3 - 特别祝福 -->
         <div class="page page-3" data-page="3">
-            <div class="special-container">
-                <h3 class="special-title">Special Wishes</h3>
-                <p class="special-text">
-                    从原神到绝区零<br>
-                    你cos的每个角色都有独特的灵魂<br>
-                    希望你在属于自己的舞台上闪闪发光
-                </p>
-                <p class="special-text jp">
-                    原神からゼンレスゾーンゼロまで<br>
-                    あなたがcosするキャラクターたちは<br>
-                    それぞれ素晴らしい魂を持っている<br>
-                    あなた自身も、自分の舞台で輝いていますように
-                </p>
+            <div class="special-layout">
+                <div class="tag-cloud">
+                    <span class="char-tag">✦ GENSHIN IMPACT</span>
+                    <span class="char-tag">✦ ZENLESS ZONE ZERO</span>
+                    <span class="char-tag">✦ COSPLAY SOUL</span>
+                    <span class="char-tag">✦ STARDUST</span>
+                </div>
+                <div class="story-box">
+                    <h3 class="story-title">SPECIAL STORY</h3>
+                    <p class="story-text">
+                        从提瓦特大陆到新艾利都<br>
+                        你赋予了每个角色独特的灵魂<br>
+                        希望在属于你的舞台上，你永远是最耀眼的星辰
+                    </p>
+                    <p class="story-text" style="font-family: 'Noto Serif JP', serif; font-size: 0.9rem; opacity: 0.7;">
+                        テイワットから新エリドゥまで、あなたはキャラクターたちに魂を吹き込んできた。<br>
+                        あなた自身の舞台で、永遠に輝く星でありますように。
+                    </p>
+                </div>
             </div>
         </div>
         
         <!-- Page 4 - 结尾 -->
         <div class="page page-4" data-page="4">
-            <div class="final-container">
-                <h3 class="final-title">Until Next Year</h3>
-                <p class="click-hint">点击下方按钮许下心愿</p>
-                <button class="heart-button" id="heartBtn">✦</button>
-                <p class="final-message">
-                    明年今日，愿你更好
-                    <span class="jp">来年も、もっと輝いていますように</span>
-                </p>
+            <div class="core-container">
+                <div class="star-soul-core">
+                    <div class="orbit"></div>
+                    <div class="orbit"></div>
+                    <div class="orbit"></div>
+                    <button class="heart-button" id="heartBtn">✦</button>
+                </div>
+                <div class="final-words">
+                    <h3>UNTIL NEXT YEAR</h3>
+                    <p style="letter-spacing: 0.5em; opacity: 0.6; margin-bottom: 2rem;">TAP TO MAKE A WISH</p>
+                    <p class="final-message">
+                        明年今日，愿你更好
+                        <span class="jp" style="display: block; font-size: 0.9rem; margin-top: 1rem; color: var(--accent-magenta);">来年も、もっと輝いていますように</span>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
