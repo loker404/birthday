@@ -1084,38 +1084,68 @@
         
         /* 响应式 */
         @media (max-width: 768px) {
-            .page-2 .blessing-card,
-            .page-3 .special-container {
-                padding: 2.5rem 1.5rem;
-                margin: 0 1rem;
-            }
-            
-            .page-3 .character-refs {
-                gap: 0.6rem;
-            }
-            
-            .page-3 .char-tag {
-                padding: 0.5rem 1rem;
-                font-size: 0.8rem;
-            }
-            
-            .nav-dots {
-                right: 1rem;
+            .page-2 .hologram-window {
+                grid-template-columns: 1fr;
+                padding: 1.5rem;
                 gap: 1rem;
             }
-            
-            .nav-arrow {
-                bottom: 2rem;
+            .page-2 .side-title {
+                writing-mode: horizontal-tb;
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+                padding-right: 0;
+                padding-bottom: 0.5rem;
+                font-size: 1.2rem;
+                letter-spacing: 0.5em;
+                text-align: left;
+                color: rgba(0, 217, 255, 0.4);
             }
-            
+            .page-2 .content-box {
+                width: 100%;
+            }
+            .page-2 .blessing-text {
+                font-size: 1.05rem;
+                line-height: 1.8;
+            }
+            .page-3 .special-layout {
+                gap: 2rem;
+                padding: 1rem;
+            }
+            .page-3 .story-box {
+                text-align: left;
+                border-right: none;
+                border-left: 2px solid var(--accent-cyan);
+                padding-right: 0;
+                padding-left: 1.2rem;
+                align-self: flex-start;
+            }
+            .page-3 .story-title {
+                font-size: 1.8rem;
+            }
+            .page-3 .story-text {
+                font-size: 1rem;
+                line-height: 2;
+            }
+            .page-4 .star-soul-core {
+                width: 150px;
+                height: 150px;
+                margin-bottom: 2rem;
+            }
+            .page-4 .final-words h3 {
+                font-size: 1.8rem;
+            }
+            .nav-dots {
+                right: 1rem;
+                gap: 0.8rem;
+            }
+            .nav-dot {
+                width: 8px;
+                height: 8px;
+            }
             .nav-arrow button {
-                width: 44px;
-                height: 44px;
-            }
-            
-            .corner-deco {
-                width: 50px;
-                height: 50px;
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
             }
         }
     </style>
@@ -1212,12 +1242,12 @@
                 <div class="story-box">
                     <h3 class="story-title">SPECIAL STORY</h3>
                     <p class="story-text">
-                        从提瓦特大陆到新艾利都<br>
                         你赋予了每个角色独特的灵魂<br>
-                        希望在属于你的舞台上，你永远是最耀眼的星辰
+                        希望在属于你的舞台上<br>
+                        你永远是最耀眼的星辰
                     </p>
                     <p class="story-text" style="font-family: 'Noto Serif JP', serif; font-size: 0.9rem; opacity: 0.7;">
-                        テイワットから新エリドゥまで、あなたはキャラクターたちに魂を吹き込んできた。<br>
+                        あなたはキャラクターたちに魂を吹き込んできた。<br>
                         あなた自身の舞台で、永遠に輝く星でありますように。
                     </p>
                 </div>
@@ -1812,10 +1842,20 @@
         // --- 3. 动画与交互 ---
         let mouseX = 0;
         let mouseY = 0;
+        
+        // 桌面端鼠标交互
         window.addEventListener('mousemove', (e) => {
             mouseX = (e.clientX - window.innerWidth / 2) / 100;
             mouseY = (e.clientY - window.innerHeight / 2) / 100;
         });
+
+        // 移动端触控交互
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                mouseX = (e.touches[0].clientX - window.innerWidth / 2) / 80;
+                mouseY = (e.touches[0].clientY - window.innerHeight / 2) / 80;
+            }
+        }, { passive: true });
 
         function updateEmbers() {
             const pos = embersPoints.geometry.attributes.position.array;
