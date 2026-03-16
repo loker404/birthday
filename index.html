@@ -1633,7 +1633,6 @@
             posArray[i+1] = (Math.random() - 0.5) * 2000;
             posArray[i+2] = (Math.random() - 0.5) * 2000;
             
-            // 随机星空颜色 (蓝/紫/白)
             const r = Math.random() > 0.8 ? 1 : 0.5 + Math.random() * 0.5;
             const g = 0.8 + Math.random() * 0.2;
             const b = 1;
@@ -1655,6 +1654,27 @@
         });
         const starPoints = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(starPoints);
+
+        // --- 1.5 增加环境星尘 (Ethereal Embers) ---
+        const embersGeometry = new THREE.BufferGeometry();
+        const embersCount = 200;
+        const embersPos = new Float32Array(embersCount * 3);
+        for(let i = 0; i < embersCount * 3; i+=3) {
+            embersPos[i] = (Math.random() - 0.5) * 400;
+            embersPos[i+1] = (Math.random() - 0.5) * 300;
+            embersPos[i+2] = (Math.random() - 0.5) * 400;
+        }
+        embersGeometry.setAttribute('position', new THREE.BufferAttribute(embersPos, 3));
+        const embersMaterial = new THREE.PointsMaterial({
+            size: 4,
+            color: 0xc084fc,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            map: starTexture,
+            opacity: 0
+        });
+        const embersPoints = new THREE.Points(embersGeometry, embersMaterial);
+        scene.add(embersPoints);
 
         // --- 2. 创建粒子蛋糕 (美术重构版) ---
         const cakeGroup = new THREE.Group();
@@ -1787,6 +1807,25 @@
         scene.add(cakeGroup);
 
         // --- 3. 动画与交互 ---
+        let mouseX = 0;
+        let mouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) / 100;
+            mouseY = (e.clientY - window.innerHeight / 2) / 100;
+        });
+
+        function updateEmbers() {
+            const pos = embersPoints.geometry.attributes.position.array;
+            const time = Date.now() * 0.0005;
+            for(let i = 0; i < embersCount * 3; i+=3) {
+                pos[i] += Math.sin(time + i) * 0.2;
+                pos[i+1] += Math.cos(time + i) * 0.3 + 0.1;
+                pos[i+2] += Math.cos(time + i * 0.5) * 0.2;
+                if (pos[i+1] > 200) pos[i+1] = -200;
+            }
+            embersPoints.geometry.attributes.position.needsUpdate = true;
+        }
+
         function updateFlame() {
             const pos = flamePoints.geometry.attributes.position.array;
             const cols = flamePoints.geometry.attributes.color.array;
@@ -1794,23 +1833,11 @@
             
             for(let i = 0; i < flameCount * 3; i+=3) {
                 const pIndex = i / 3;
-                
-                // --- 1. 核心逻辑：上升的生命周期 ---
-                // 每个粒子根据 pIndex 偏移，实现持续上升的效果
                 let life = (time * 1.5 + pIndex / flameCount) % 1.0; 
-                
-                // --- 2. 形状控制：泪滴状 (尺寸缩小) ---
                 const radius = Math.pow(1.0 - life, 1.5) * 12 * (life > 0.1 ? 1 : life / 0.1);
-                
-                // --- 3. 动态效果：整体抖动而非扭动 ---
-                // 全局晃动 (模拟空气对流)
                 const globalSwingX = Math.sin(time * 4) * 2.2 * life;
                 const globalSwingZ = Math.cos(time * 3) * 1.5 * life;
-                
-                // 高频微颤 (模拟火焰的不稳定性)
                 const jitter = (Math.sin(pIndex * 0.5 + time * 20) * 1.1) * life;
-
-                // 极坐标转换为笛卡尔坐标，增加随机散布
                 const angle = (pIndex * 0.7) % (Math.PI * 2);
                 const r = Math.sqrt((pIndex * 0.11) % 1.0) * radius;
                 
@@ -1818,15 +1845,11 @@
                 pos[i+1] = 152 + (life * 40); // 蜡烛顶端 150，从 152 开始升腾
                 pos[i+2] = Math.sin(angle) * r + globalSwingZ;
                 
-                // --- 4. 颜色重构：蓝芯 -> 金黄 -> 橙红 ---
                 if (life < 0.1) {
-                    // 底部蓝芯 (米哈游风格的青色调)
                     cols[i] = 0.0; cols[i+1] = 0.8; cols[i+2] = 1.0; 
                 } else if (life < 0.7) {
-                    // 中段金黄
                     cols[i] = 1.0; cols[i+1] = 0.9; cols[i+2] = 0.2;
                 } else {
-                    // 顶端橙红并变暗
                     const fade = 1.0 - (life - 0.7) / 0.3;
                     cols[i] = 1.0 * fade; 
                     cols[i+1] = 0.3 * fade; 
@@ -1839,26 +1862,59 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            
+            // 星空动态：整体旋转 + 个体闪烁
             starPoints.rotation.y += 0.0003;
-            updateFlame();
+            starPoints.rotation.z += 0.0001; // 增加微弱的 Z 轴旋转，增加空间迷失感
+            
+            // 星星闪烁逻辑 (通过修改 opacity 或 size 模拟，这里为了性能修改 size)
+            // 注意：大规模 buffer 更新较耗性能，这里仅演示简单旋转，
+            // 若要极致闪烁需在 ShaderMaterial 中实现，为保持代码简洁，
+            // 我们使用材质的全局 opacity 呼吸来模拟氛围。
+            // (更高级的 Shader 方案代码量较大，此处采用 JS 模拟微弱呼吸)
             const time = Date.now() * 0.001;
+            starsMaterial.size = 3 + Math.sin(time) * 0.5;
+
+            updateFlame();
+            updateEmbers();
+
+            // 鼠标视差平滑插值 (增加阻尼感)
+            camera.position.x += (mouseX * 50 - camera.position.x) * 0.03;
+            camera.position.y += (-mouseY * 50 - camera.position.y) * 0.03;
+            
+            // 始终看向场景中心，产生类似“对视”的交互感
+            camera.lookAt(0, 0, 0);
+
             cakeGroup.children.forEach((obj, i) => {
                 if(obj !== flamePoints) {
-                    obj.position.y = Math.sin(time + i) * 3;
+                    obj.position.y = Math.sin(time + i * 0.5) * 2; // 减缓呼吸频率
                 }
             });
+
             if (currentPage === 4) {
-                camera.position.z += (400 - camera.position.z) * 0.05;
+                // 希区柯克变焦效果
+                camera.position.z += (380 - camera.position.z) * 0.03; // 更平滑的推拉
+                camera.fov += (55 - camera.fov) * 0.03;
+                camera.updateProjectionMatrix();
+
+                // 蛋糕显现
                 cakeGroup.children.forEach(child => {
-                    child.material.opacity += (0.9 - child.material.opacity) * 0.05;
+                    child.material.opacity += (0.95 - child.material.opacity) * 0.03;
                 });
-                cakeGroup.rotation.y += 0.005;
+                embersPoints.material.opacity += (0.7 - embersPoints.material.opacity) * 0.03;
+                cakeGroup.rotation.y += 0.004; // 蛋糕自转
             } else {
-                camera.position.z += (800 - camera.position.z) * 0.05;
+                // 回到宇宙视角
+                camera.position.z += (800 - camera.position.z) * 0.03;
+                camera.fov += (75 - camera.fov) * 0.03;
+                camera.updateProjectionMatrix();
+
                 cakeGroup.children.forEach(child => {
                     child.material.opacity += (0 - child.material.opacity) * 0.1;
                 });
+                embersPoints.material.opacity += (0 - embersPoints.material.opacity) * 0.1;
             }
+
             renderer.render(scene, camera);
         }
 
