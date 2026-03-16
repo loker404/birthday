@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday ゆづき</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Noto+Sans+SC:wght@300;400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap');
         
@@ -1139,10 +1140,13 @@
     </style>
 </head>
 <body>
+    <!-- Three.js 3D 背景容器 -->
+    <canvas id="threeCanvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; pointer-events: none;"></canvas>
+    
     <!-- 宇宙背景层 -->
-    <div class="universe-bg"></div>
-    <div class="nebula-vortex"></div>
-    <div class="stars-layer-1" id="starsLayer"></div>
+    <div class="universe-bg" style="opacity: 0.8;"></div>
+    <div class="nebula-vortex" style="opacity: 0.5;"></div>
+    <div class="stars-layer-1" id="starsLayer" style="display: none;"></div>
     <div class="constellation" id="constellationLayer"></div>
     <div class="data-streams" id="dataStreamsLayer"></div>
     <div class="grid-bg"></div>
@@ -1602,6 +1606,269 @@
         // 初始创建一些流星和数据流
         setTimeout(createShootingStar, 2000);
         setTimeout(createDataStream, 1000);
+
+        // ==========================================
+        // Three.js 3D 粒子宇宙与蛋糕系统
+        // ==========================================
+        const canvas = document.getElementById('threeCanvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.z = 800;
+
+        // 粒子材质
+        const starTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/sprites/disc.png');
+        
+        // --- 1. 创建粒子星空 ---
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsCount = 15000;
+        const posArray = new Float32Array(starsCount * 3);
+        const colorArray = new Float32Array(starsCount * 3);
+
+        for(let i = 0; i < starsCount * 3; i+=3) {
+            posArray[i] = (Math.random() - 0.5) * 2000;
+            posArray[i+1] = (Math.random() - 0.5) * 2000;
+            posArray[i+2] = (Math.random() - 0.5) * 2000;
+            
+            // 随机星空颜色 (蓝/紫/白)
+            const r = Math.random() > 0.8 ? 1 : 0.5 + Math.random() * 0.5;
+            const g = 0.8 + Math.random() * 0.2;
+            const b = 1;
+            colorArray[i] = r;
+            colorArray[i+1] = g;
+            colorArray[i+2] = b;
+        }
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        starsGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+
+        const starsMaterial = new THREE.PointsMaterial({
+            size: 3,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            map: starTexture,
+            vertexColors: true,
+            opacity: 1.0,
+            depthWrite: false
+        });
+        const starPoints = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(starPoints);
+
+        // --- 2. 创建粒子蛋糕 (美术重构版) ---
+        const cakeGroup = new THREE.Group();
+        
+        /**
+         * 改进的粒子生成逻辑：增加表面权重，强化轮廓感
+         */
+        function createStructuredLayer(radius, height, yOffset, count, color, isTop = true) {
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            const sizes = new Float32Array(count);
+            
+            for(let i = 0; i < count * 3; i+=3) {
+                // 80% 的粒子分布在表面边缘，20% 在内部填充
+                const onSurface = Math.random() > 0.2;
+                const angle = Math.random() * Math.PI * 2;
+                const r = onSurface ? radius : Math.sqrt(Math.random()) * radius;
+                
+                pos[i] = Math.cos(angle) * r;
+                pos[i+1] = (Math.random() - 0.5) * height + yOffset;
+                pos[i+2] = Math.sin(angle) * r;
+                
+                // 顶面封顶粒子
+                if (isTop && Math.random() > 0.7) {
+                    const topR = Math.sqrt(Math.random()) * radius;
+                    pos[i] = Math.cos(angle) * topR;
+                    pos[i+1] = height/2 + yOffset;
+                    pos[i+2] = Math.sin(angle) * topR;
+                }
+                
+                sizes[i/3] = Math.random() * 2 + 1;
+            }
+            
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            
+            const mat = new THREE.PointsMaterial({
+                size: 4,
+                color: color,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                map: starTexture,
+                opacity: 0,
+                depthWrite: false
+            });
+            const points = new THREE.Points(geo, mat);
+            cakeGroup.add(points);
+            return points;
+        }
+
+        // 创建奶油花边效果
+        function createCreamDecor(radius, yOffset, count, color) {
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for(let i = 0; i < count * 3; i+=3) {
+                const angle = (i / count) * Math.PI * 2;
+                // 这种波浪形分布模拟蛋糕边缘的奶油挤花
+                const wave = Math.sin(angle * 12) * 10; 
+                pos[i] = Math.cos(angle) * (radius + wave);
+                pos[i+1] = yOffset + Math.cos(angle * 12) * 5;
+                pos[i+2] = Math.sin(angle) * (radius + wave);
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({
+                size: 6,
+                color: color,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                map: starTexture,
+                opacity: 0
+            });
+            return new THREE.Points(geo, mat);
+        }
+
+        // 重新构建分层
+        const layer1 = createStructuredLayer(160, 90, -100, 6000, 0x8b5cf6); // 底层-紫
+        const layer2 = createStructuredLayer(120, 80, -10, 4000, 0xc084fc);  // 中层-粉
+        const layer3 = createStructuredLayer(80, 70, 65, 2000, 0x00d9ff);    // 顶层-青
+        
+        // 添加装饰
+        cakeGroup.add(createCreamDecor(160, -55, 100, 0xffffff)); // 白色奶油装饰
+        cakeGroup.add(createCreamDecor(120, 30, 80, 0xffffff));
+        
+        // --- 蜡烛主体 (Candle Body) ---
+        function createCandle(radius, height, yOffset, count) {
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for(let i = 0; i < count * 3; i+=3) {
+                const angle = Math.random() * Math.PI * 2;
+                const r = Math.random() > 0.2 ? radius : Math.random() * radius;
+                pos[i] = Math.cos(angle) * r;
+                pos[i+1] = (Math.random() - 0.5) * height + yOffset;
+                pos[i+2] = Math.sin(angle) * r;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({
+                size: 3,
+                color: 0xffffff,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                map: starTexture,
+                opacity: 0
+            });
+            return new THREE.Points(geo, mat);
+        }
+        
+        const candleBody = createCandle(6, 50, 125, 600);
+        cakeGroup.add(candleBody);
+
+        // --- 动态火苗 (Dynamic Flame) ---
+        const flameGeo = new THREE.BufferGeometry();
+        const flameCount = 500;
+        const flamePos = new Float32Array(flameCount * 3);
+        const flameColors = new Float32Array(flameCount * 3);
+        flameGeo.setAttribute('position', new THREE.BufferAttribute(flamePos, 3));
+        flameGeo.setAttribute('color', new THREE.BufferAttribute(flameColors, 3));
+        
+        const flameMat = new THREE.PointsMaterial({
+            size: 5,
+            vertexColors: true,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            map: starTexture,
+            opacity: 0
+        });
+        const flamePoints = new THREE.Points(flameGeo, flameMat);
+        cakeGroup.add(flamePoints);
+
+        cakeGroup.position.set(0, -50, -500);
+        scene.add(cakeGroup);
+
+        // --- 3. 动画与交互 ---
+        function updateFlame() {
+            const pos = flamePoints.geometry.attributes.position.array;
+            const cols = flamePoints.geometry.attributes.color.array;
+            const time = Date.now() * 0.001; // 使用秒为单位更易控制
+            
+            for(let i = 0; i < flameCount * 3; i+=3) {
+                const pIndex = i / 3;
+                
+                // --- 1. 核心逻辑：上升的生命周期 ---
+                // 每个粒子根据 pIndex 偏移，实现持续上升的效果
+                let life = (time * 1.5 + pIndex / flameCount) % 1.0; 
+                
+                // --- 2. 形状控制：泪滴状 (尺寸缩小) ---
+                const radius = Math.pow(1.0 - life, 1.5) * 12 * (life > 0.1 ? 1 : life / 0.1);
+                
+                // --- 3. 动态效果：整体抖动而非扭动 ---
+                // 全局晃动 (模拟空气对流)
+                const globalSwingX = Math.sin(time * 4) * 2.2 * life;
+                const globalSwingZ = Math.cos(time * 3) * 1.5 * life;
+                
+                // 高频微颤 (模拟火焰的不稳定性)
+                const jitter = (Math.sin(pIndex * 0.5 + time * 20) * 1.1) * life;
+
+                // 极坐标转换为笛卡尔坐标，增加随机散布
+                const angle = (pIndex * 0.7) % (Math.PI * 2);
+                const r = Math.sqrt((pIndex * 0.11) % 1.0) * radius;
+                
+                pos[i] = Math.cos(angle) * r + globalSwingX + jitter;
+                pos[i+1] = 152 + (life * 40); // 蜡烛顶端 150，从 152 开始升腾
+                pos[i+2] = Math.sin(angle) * r + globalSwingZ;
+                
+                // --- 4. 颜色重构：蓝芯 -> 金黄 -> 橙红 ---
+                if (life < 0.1) {
+                    // 底部蓝芯 (米哈游风格的青色调)
+                    cols[i] = 0.0; cols[i+1] = 0.8; cols[i+2] = 1.0; 
+                } else if (life < 0.7) {
+                    // 中段金黄
+                    cols[i] = 1.0; cols[i+1] = 0.9; cols[i+2] = 0.2;
+                } else {
+                    // 顶端橙红并变暗
+                    const fade = 1.0 - (life - 0.7) / 0.3;
+                    cols[i] = 1.0 * fade; 
+                    cols[i+1] = 0.3 * fade; 
+                    cols[i+2] = 0.1 * fade;
+                }
+            }
+            flamePoints.geometry.attributes.position.needsUpdate = true;
+            flamePoints.geometry.attributes.color.needsUpdate = true;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            starPoints.rotation.y += 0.0003;
+            updateFlame();
+            const time = Date.now() * 0.001;
+            cakeGroup.children.forEach((obj, i) => {
+                if(obj !== flamePoints) {
+                    obj.position.y = Math.sin(time + i) * 3;
+                }
+            });
+            if (currentPage === 4) {
+                camera.position.z += (400 - camera.position.z) * 0.05;
+                cakeGroup.children.forEach(child => {
+                    child.material.opacity += (0.9 - child.material.opacity) * 0.05;
+                });
+                cakeGroup.rotation.y += 0.005;
+            } else {
+                camera.position.z += (800 - camera.position.z) * 0.05;
+                cakeGroup.children.forEach(child => {
+                    child.material.opacity += (0 - child.material.opacity) * 0.1;
+                });
+            }
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
     </script>
 </body>
 </html>
