@@ -497,6 +497,67 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+
+        /* 生日倒计时样式 */
+        .page-1 .countdown-container {
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1.5s ease-out 0.8s forwards;
+        }
+
+        .page-1 .countdown-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .page-1 .countdown {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .page-1 .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+
+        .page-1 .countdown-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+            line-height: 1;
+        }
+
+        .page-1 .countdown-unit {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.1em;
+            margin-top: 0.3rem;
+        }
+
+        .page-1 .countdown-separator {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            color: rgba(0, 217, 255, 0.4);
+            align-self: flex-start;
+            margin-top: 0.3rem;
+        }
+
+        .page-1 .birthday-today {
+            font-family: 'Noto Serif JP', serif;
+            font-size: 1rem;
+            color: var(--accent-gold);
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+            letter-spacing: 0.2em;
+        }
         
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
@@ -512,6 +573,23 @@
             from { opacity: 0; transform: scale(0.9); filter: blur(10px); }
             to { opacity: 1; transform: scale(1); filter: blur(0); }
         }
+
+        /* 文字逐行淡入动画 */
+        .line-reveal {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .page.active .line-reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .line-reveal.delay-1 { transition-delay: 0.1s; }
+        .line-reveal.delay-2 { transition-delay: 0.2s; }
+        .line-reveal.delay-3 { transition-delay: 0.3s; }
+        .line-reveal.delay-4 { transition-delay: 0.4s; }
+        .line-reveal.delay-5 { transition-delay: 0.5s; }
+        .line-reveal.delay-6 { transition-delay: 0.6s; }
 
         /* Page 2 - 祝福语 - 全息视窗重构 */
         .page-2 .hologram-window {
@@ -603,12 +681,71 @@
             letter-spacing: 0.1em;
             backdrop-filter: blur(5px);
             transition: all 0.3s ease;
-            animation: tagPulse 3s infinite alternate;
+            cursor: default;
         }
 
-        @keyframes tagPulse {
-            from { box-shadow: 0 0 5px rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.3); }
-            to { box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); border-color: rgba(139, 92, 246, 0.6); }
+        /* 游戏专属配色 - 原神金 */
+        .page-3 .char-tag.genshin {
+            background: rgba(245, 195, 66, 0.1);
+            border-color: rgba(245, 195, 66, 0.4);
+            color: #f5c342;
+            animation: tagGenshin 3s infinite alternate;
+        }
+        .page-3 .char-tag.genshin:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(245, 195, 66, 0.6), 0 0 40px rgba(245, 195, 66, 0.3);
+        }
+        @keyframes tagGenshin {
+            from { box-shadow: 0 0 5px rgba(245, 195, 66, 0.3); }
+            to { box-shadow: 0 0 15px rgba(245, 195, 66, 0.5); }
+        }
+
+        /* 游戏专属配色 - 绝区零青 */
+        .page-3 .char-tag.zzz {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: rgba(0, 217, 255, 0.4);
+            color: #00d9ff;
+            animation: tagZZZ 3s infinite alternate;
+        }
+        .page-3 .char-tag.zzz:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.6), 0 0 40px rgba(0, 217, 255, 0.3);
+        }
+        @keyframes tagZZZ {
+            from { box-shadow: 0 0 5px rgba(0, 217, 255, 0.3); }
+            to { box-shadow: 0 0 15px rgba(0, 217, 255, 0.5); }
+        }
+
+        /* 游戏专属配色 - 瓦洛兰特红 */
+        .page-3 .char-tag.valorant {
+            background: rgba(255, 70, 85, 0.1);
+            border-color: rgba(255, 70, 85, 0.4);
+            color: #ff4655;
+            animation: tagValorant 3s infinite alternate;
+        }
+        .page-3 .char-tag.valorant:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 70, 85, 0.6), 0 0 40px rgba(255, 70, 85, 0.3);
+        }
+        @keyframes tagValorant {
+            from { box-shadow: 0 0 5px rgba(255, 70, 85, 0.3); }
+            to { box-shadow: 0 0 15px rgba(255, 70, 85, 0.5); }
+        }
+
+        /* 游戏专属配色 - 星尘紫 */
+        .page-3 .char-tag.stardust {
+            background: rgba(192, 132, 252, 0.1);
+            border-color: rgba(192, 132, 252, 0.4);
+            color: #c084fc;
+            animation: tagStardust 3s infinite alternate;
+        }
+        .page-3 .char-tag.stardust:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(192, 132, 252, 0.6), 0 0 40px rgba(192, 132, 252, 0.3);
+        }
+        @keyframes tagStardust {
+            from { box-shadow: 0 0 5px rgba(192, 132, 252, 0.3); }
+            to { box-shadow: 0 0 15px rgba(192, 132, 252, 0.5); }
         }
 
         .page-3 .story-box {
@@ -1208,6 +1345,30 @@
                 <div class="date">4.18</div>
                 <span class="deco-star">✦</span>
             </div>
+            <div class="countdown-container" id="countdownContainer">
+                <p class="countdown-label">距离生日还有</p>
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="countDays">00</span>
+                        <span class="countdown-unit">天</span>
+                    </div>
+                    <span class="countdown-separator">:</span>
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="countHours">00</span>
+                        <span class="countdown-unit">时</span>
+                    </div>
+                    <span class="countdown-separator">:</span>
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="countMinutes">00</span>
+                        <span class="countdown-unit">分</span>
+                    </div>
+                    <span class="countdown-separator">:</span>
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="countSeconds">00</span>
+                        <span class="countdown-unit">秒</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Page 2 - 祝福语 -->
@@ -1215,16 +1376,16 @@
             <div class="hologram-window">
                 <div class="side-title">WISHES</div>
                 <div class="content-box">
-                    <h3 class="blessing-title">BIRTHDAY MESSAGE</h3>
+                    <h3 class="blessing-title line-reveal delay-1">BIRTHDAY MESSAGE</h3>
                     <p class="blessing-text">
-                        愿你继续带着热爱前行<br>
-                        在游戏里收藏星光，在生活中积攒温柔<br>
-                        在虚拟与现实之间，始终有自己的宁静与光
+                        <span class="line-reveal delay-2">愿你继续带着热爱前行</span><br>
+                        <span class="line-reveal delay-3">在游戏里收藏星光，在生活中积攒温柔</span><br>
+                        <span class="line-reveal delay-4">在虚拟与现实之间，始终有自己的宁静与光</span>
                     </p>
                     <p class="blessing-text jp">
-                        大好きなことを持って進んでね<br>
-                        ゲームで星を集め、日常に優しさを溜めて<br>
-                        仮想と現実の間で、いつも自分の静けさと光を持っていますように
+                        <span class="line-reveal delay-5">大好きなことを持って進んでね</span><br>
+                        <span class="line-reveal delay-6">ゲームで星を集め、日常に優しさを溜めて</span><br>
+                        <span class="line-reveal delay-6">仮想と現実の間で、いつも自分の静けさと光を持っていますように</span>
                     </p>
                 </div>
             </div>
@@ -1234,19 +1395,19 @@
         <div class="page page-3" data-page="3">
             <div class="special-layout">
                 <div class="tag-cloud">
-                    <span class="char-tag">✦ GENSHIN IMPACT</span>
-                    <span class="char-tag">✦ ZENLESS ZONE ZERO</span>
-                    <span class="char-tag">✦ VALORANT</span>
-                    <span class="char-tag">✦ STARDUST</span>
+                    <span class="char-tag genshin line-reveal delay-1">✦ GENSHIN IMPACT</span>
+                    <span class="char-tag zzz line-reveal delay-2">✦ ZENLESS ZONE ZERO</span>
+                    <span class="char-tag valorant line-reveal delay-3">✦ VALORANT</span>
+                    <span class="char-tag stardust line-reveal delay-4">✦ STARDUST</span>
                 </div>
                 <div class="story-box">
-                    <h3 class="story-title">SPECIAL STORY</h3>
+                    <h3 class="story-title line-reveal delay-2">SPECIAL STORY</h3>
                     <p class="story-text">
-                        你赋予了每个角色独特的灵魂<br>
-                        希望在属于你的舞台上<br>
-                        你永远是最耀眼的星辰
+                        <span class="line-reveal delay-3">你赋予了每个角色独特的灵魂</span><br>
+                        <span class="line-reveal delay-4">希望在属于你的舞台上</span><br>
+                        <span class="line-reveal delay-5">你永远是最耀眼的星辰</span>
                     </p>
-                    <p class="story-text" style="font-family: 'Noto Serif JP', serif; font-size: 0.9rem; opacity: 0.7;">
+                    <p class="story-text line-reveal delay-6" style="font-family: 'Noto Serif JP', serif; font-size: 0.9rem; opacity: 0.7;">
                         あなたはキャラクターたちに魂を吹き込んできた。<br>
                         あなた自身の舞台で、永遠に輝く星でありますように。
                     </p>
@@ -1304,6 +1465,62 @@
         const musicControl = document.getElementById('musicControl');
         const heartBtn = document.getElementById('heartBtn');
         const fireworksContainer = document.getElementById('fireworksContainer');
+        
+        // ==========================================
+        // 生日倒计时功能
+        // ==========================================
+        const birthdayMonth = 4;  // 4月
+        const birthdayDay = 18;   // 18日
+        const countDays = document.getElementById('countDays');
+        const countHours = document.getElementById('countHours');
+        const countMinutes = document.getElementById('countMinutes');
+        const countSeconds = document.getElementById('countSeconds');
+        const countdownContainer = document.getElementById('countdownContainer');
+        const countdownLabel = countdownContainer.querySelector('.countdown-label');
+        
+        function updateCountdown() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            // 计算今年或明年的生日日期
+            let birthday = new Date(currentYear, birthdayMonth - 1, birthdayDay, 0, 0, 0);
+            
+            // 如果今年生日已过，计算到明年生日
+            if (now > birthday) {
+                birthday = new Date(currentYear + 1, birthdayMonth - 1, birthdayDay, 0, 0, 0);
+            }
+            
+            const diff = birthday - now;
+            
+            // 检查是否是生日当天
+            const today = new Date();
+            const isBirthdayToday = today.getMonth() === birthdayMonth - 1 && today.getDate() === birthdayDay;
+            
+            if (isBirthdayToday) {
+                countdownLabel.textContent = '今天是你的生日';
+                countdownContainer.querySelector('.countdown').innerHTML = '<span class="birthday-today">🎂 生日快乐！🎂</span>';
+                return;
+            }
+            
+            if (diff <= 0) {
+                countdownLabel.textContent = '生日快乐';
+                return;
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            countDays.textContent = String(days).padStart(2, '0');
+            countHours.textContent = String(hours).padStart(2, '0');
+            countMinutes.textContent = String(minutes).padStart(2, '0');
+            countSeconds.textContent = String(seconds).padStart(2, '0');
+        }
+        
+        // 启动倒计时
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
         
         // 页面切换 - 优化流畅度
         let isTransitioning = false;
