@@ -214,8 +214,6 @@
             background-size: 60px 60px;
             z-index: -2;
             animation: gridPulse 6s ease-in-out infinite;
-            perspective: 1000px;
-            transform-style: preserve-3d;
         }
         
         @keyframes gridPulse {
@@ -244,6 +242,7 @@
             animation: sakuraFall ease-in-out infinite;
             opacity: 0.6;
             filter: blur(0.3px);
+            will-change: transform, opacity;
         }
         
         @keyframes sakuraFall {
@@ -278,6 +277,7 @@
             position: absolute;
             border-radius: 50%;
             animation: float ease-in-out infinite;
+            will-change: transform, opacity;
         }
         
         @keyframes float {
@@ -342,18 +342,7 @@
             pointer-events: none;
         }
         
-        /* 优雅的文字效果 - 替代刺眼的霓虹 */
-        .elegant-text {
-            background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-rose) 50%, var(--accent-silver) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: none;
-        }
-        
-        .glow-text {
-            text-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
-        }
+
         
         /* 全局后期处理层 */
         .vignette {
@@ -863,6 +852,7 @@
             border-radius: 50%;
             animation: fireworkExplode 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
             box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+            will-change: transform, opacity;
         }
         
         .firework-particle.core {
@@ -1296,7 +1286,7 @@
     <div class="nebula-vortex" style="opacity: 0.5;"></div>
     <div class="stars-layer-1" id="starsLayer" style="display: none;"></div>
     <div class="constellation" id="constellationLayer"></div>
-    <div class="data-streams" id="dataStreamsLayer"></div>
+    <div class="data-stream-container" id="dataStreamsLayer"></div>
     <div class="grid-bg"></div>
     <div class="deco-lines">
         <div class="deco-line"></div>
@@ -1631,9 +1621,11 @@
             isPlaying = !isPlaying;
         });
         
-        // 创建樱花 - 更自然的效果
+        // 创建樱花 - 更自然的效果（带数量上限）
+        const SAKURA_MAX = 15;
         function createSakura() {
             const container = document.getElementById('sakuraContainer');
+            if (container.childElementCount >= SAKURA_MAX) return;
             const sakura = document.createElement('div');
             sakura.className = 'sakura';
             sakura.style.left = Math.random() * 100 + 'vw';
@@ -1645,9 +1637,11 @@
             setTimeout(() => sakura.remove(), 16000);
         }
         
-        // 创建光粒子 - 更柔和
+        // 创建光粒子 - 更柔和（带数量上限）
+        const PARTICLE_MAX = 20;
         function createParticle() {
             const container = document.getElementById('particlesContainer');
+            if (container.childElementCount >= PARTICLE_MAX) return;
             const particle = document.createElement('div');
             particle.className = 'particle';
             
@@ -1833,9 +1827,9 @@
             setTimeout(() => stream.remove(), 10000);
         }
         
-        // 初始化动画 - 更平缓的频率
-        setInterval(createSakura, 400);
-        setInterval(createParticle, 300);
+        // 初始化动画 - 降低频率
+        setInterval(createSakura, 600);
+        setInterval(createParticle, 500);
         
         // 初始化宇宙效果
         createStars();
@@ -1874,7 +1868,7 @@
         
         // --- 1. 创建粒子星空 ---
         const starsGeometry = new THREE.BufferGeometry();
-        const starsCount = 15000;
+        const starsCount = 8000;
         const posArray = new Float32Array(starsCount * 3);
         const colorArray = new Float32Array(starsCount * 3);
 
@@ -1907,7 +1901,7 @@
 
         // --- 1.5 增加环境星尘 (Ethereal Embers) ---
         const embersGeometry = new THREE.BufferGeometry();
-        const embersCount = 200;
+        const embersCount = 100;
         const embersPos = new Float32Array(embersCount * 3);
         for(let i = 0; i < embersCount * 3; i+=3) {
             embersPos[i] = (Math.random() - 0.5) * 400;
