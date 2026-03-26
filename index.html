@@ -1122,6 +1122,42 @@
             opacity: 1;
         }
         
+        .music-btn.playing {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            animation: musicPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(0, 217, 255, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 217, 255, 0.6), 0 0 60px rgba(139, 92, 246, 0.3); }
+        }
+        
+        /* 音乐播放提示 */
+        .music-toast {
+            position: fixed;
+            top: 5rem;
+            right: 2rem;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(25, 25, 50, 0.9));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--ui-border);
+            border-radius: 8px;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            z-index: 101;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+        
+        .music-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
         /* 装饰线条 - 游戏风格扫描线 */
         .deco-lines {
             position: fixed;
@@ -1317,10 +1353,12 @@
     <div class="music-control" id="musicControl">
         <button class="music-btn" id="musicBtn">♪</button>
     </div>
+    <div class="music-toast" id="musicToast"></div>
     
     <!-- 背景音乐 -->
     <audio id="bgMusic" loop>
         <source src="music.mp3" type="audio/mpeg">
+        <source src="music.ogg" type="audio/ogg">
     </audio>
     
     <!-- 页面容器 -->
@@ -1607,18 +1645,53 @@
         }
         
         // 音乐控制
+        const musicToast = document.getElementById('musicToast');
         let isPlaying = false;
-        musicBtn.addEventListener('click', () => {
+        let toastTimer = null;
+        
+        function showMusicToast(msg) {
+            musicToast.textContent = msg;
+            musicToast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => musicToast.classList.remove('show'), 3000);
+        }
+
+        function onMusicPlaySuccess() {
+            isPlaying = true;
+            musicBtn.textContent = '♫';
+            musicBtn.classList.add('playing');
+            showMusicToast('正在播放: DAMIDAMI - 绝区零');
+        }
+        
+        function startMusic() {
+            bgMusic.volume = 0.6;
+            return bgMusic.play().then(onMusicPlaySuccess);
+        }
+        
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             if (isPlaying) {
                 bgMusic.pause();
                 musicBtn.textContent = '♪';
+                musicBtn.classList.remove('playing');
+                showMusicToast('音乐已暂停');
+                isPlaying = false;
             } else {
-                bgMusic.play().catch(() => {
-                    console.log('音乐播放需要用户交互');
+                startMusic().catch(() => {
+                    showMusicToast('请点击播放按钮开启音乐');
                 });
-                musicBtn.textContent = '♫';
             }
-            isPlaying = !isPlaying;
+        });
+        
+        // 音乐播放失败提示
+        bgMusic.addEventListener('error', () => {
+            showMusicToast('未找到 music.mp3，请先添加音乐文件');
+        });
+
+        // 页面加载后自动播放音乐
+        startMusic().catch(() => {
+            // 浏览器阻止自动播放，等待用户首次交互后播放
+            document.addEventListener('click', () => startMusic().catch(() => {}), { once: true });
         });
         
         // 创建樱花 - 更自然的效果（带数量上限）
