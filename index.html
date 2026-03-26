@@ -1499,6 +1499,8 @@
         // ==========================================
         const birthdayMonth = 4;  // 4月
         const birthdayDay = 18;   // 18日
+        const today = new Date();
+        const isBirthdayToday = today.getMonth() === birthdayMonth - 1 && today.getDate() === birthdayDay;
         const countDays = document.getElementById('countDays');
         const countHours = document.getElementById('countHours');
         const countMinutes = document.getElementById('countMinutes');
@@ -1521,9 +1523,6 @@
             const diff = birthday - now;
             
             // 检查是否是生日当天
-            const today = new Date();
-            const isBirthdayToday = today.getMonth() === birthdayMonth - 1 && today.getDate() === birthdayDay;
-            
             if (isBirthdayToday) {
                 countdownLabel.textContent = '今天是你的生日';
                 countdownContainer.querySelector('.countdown').innerHTML = '<span class="birthday-today">🎂 生日快乐！🎂</span>';
@@ -1552,8 +1551,21 @@
         
         // 页面切换 - 优化流畅度
         let isTransitioning = false;
+        let pageToastTimer = null;
+
+        function showPageToast(msg) {
+            const toast = document.getElementById('musicToast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(pageToastTimer);
+            pageToastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+        }
         
         function goToPage(pageNum) {
+            if (!isBirthdayToday) {
+                showPageToast('生日当天才能解锁更多页面哦～');
+                return;
+            }
             if (pageNum < 1 || pageNum > totalPages) return;
             if (pageNum === currentPage || isTransitioning) return;
             
@@ -1647,13 +1659,9 @@
         // 音乐控制
         const musicToast = document.getElementById('musicToast');
         let isPlaying = false;
-        let toastTimer = null;
         
         function showMusicToast(msg) {
-            musicToast.textContent = msg;
-            musicToast.classList.add('show');
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => musicToast.classList.remove('show'), 3000);
+            showPageToast(msg);
         }
 
         function onMusicPlaySuccess() {
